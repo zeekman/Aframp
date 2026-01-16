@@ -18,7 +18,7 @@ Built on the **Stellar network** with multi-chain compatibility, AFRAMP connects
 The AFRAMP frontend repository is organized for clarity and scalability:
 
 ```
-aframp-frontend/
+Aframp/
 ├── public/                 # Static assets
 ├── src/
 │   ├── assets/            # Images, fonts, icons
@@ -51,8 +51,8 @@ Ensure you have the following installed on your system:
 ### Installation & Running
 1.  **Clone the repository and install dependencies:**
     ```bash
-    git clone https://github.com/your-org/aframp-frontend.git
-    cd aframp-frontend
+    git clone https://github.com/your-org/Aframp.git
+    cd Aframp
     npm install
     ```
 
@@ -60,7 +60,7 @@ Ensure you have the following installed on your system:
     ```bash
     cp .env.example .env.local
     ```
-    Edit the `.env.local` file to set your configuration, such as the backend API URL and Stellar network (Testnet/Mainnet).
+    Edit the `.env` file to set your configuration, such as the backend API URL and Stellar network (Testnet/Mainnet).
 
 3.  **Start the development server:**
     ```bash
