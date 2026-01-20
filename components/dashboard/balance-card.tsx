@@ -25,8 +25,8 @@ export function BalanceCard({ balance }: BalanceCardProps) {
   const displayUsdValue = usdValue
     ? `$${usdValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     : priceError
-    ? "Error"
-    : "—"
+      ? "Error"
+      : "—"
 
   // Format change percentage
   const displayChange = change !== undefined ? `${change > 0 ? "+" : ""}${change.toFixed(2)}%` : null
@@ -71,11 +71,6 @@ export function BalanceCard({ balance }: BalanceCardProps) {
             </span>
           )}
         </div>
-        {price && !priceError && (
-          <div className="text-xs text-muted-foreground mt-1">
-            ${price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per {symbol}
-          </div>
-        )}
       </div>
     </motion.div>
   )

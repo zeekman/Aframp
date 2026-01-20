@@ -19,7 +19,7 @@ interface EthPriceResponse {
   symbols: EthSymbol[]
 }
 
-export function useBalances() {
+export function useBalances(walletAddress?: string) {
   // Initial balances (in a real app, these would come from wallet/API)
   const [balances, setBalances] = useState<TokenBalance[]>([
     {
@@ -50,6 +50,46 @@ export function useBalances() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
 
+  // Fetch ETH balance from blockchain
+  const fetchWalletEthBalance = useCallback(async (address: string) => {
+    try {
+      // Using Infura free tier or similar RPC provider
+      const response = await fetch("https://eth-mainnet.g.alchemy.com/v2/demo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "eth_getBalance",
+          params: [address, "latest"],
+          id: 1,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.result) {
+        // Convert from Wei to ETH (1 ETH = 10^18 Wei)
+        const balanceInWei = BigInt(data.result)
+        const balanceInEth = Number(balanceInWei) / 1e18
+
+        setBalances((prev) =>
+          prev.map((balance) =>
+            balance.symbol === "ETH"
+              ? {
+                ...balance,
+                amount: balanceInEth,
+              }
+              : balance
+          )
+        )
+      }
+    } catch (error) {
+      console.error("Error fetching wallet ETH balance:", error)
+    }
+  }, [])
+
   const fetchEthPrice = useCallback(async () => {
     try {
       const response = await fetch("https://kelly-musk.up.railway.app/api/eth-price", {
@@ -65,12 +105,12 @@ export function useBalances() {
       }
 
       const data: EthPriceResponse = await response.json()
-      
+
       let ethPrice: number | null = null
-      
+
       if (data.status === "success" && data.symbols && Array.isArray(data.symbols) && data.symbols.length > 0) {
         const ethSymbol = data.symbols.find((s) => s.symbol === "ETH") || data.symbols[0]
-        
+
         if (ethSymbol && ethSymbol.last !== undefined) {
           ethPrice = typeof ethSymbol.last === "string" ? parseFloat(ethSymbol.last) : ethSymbol.last
         }
@@ -81,11 +121,11 @@ export function useBalances() {
           prev.map((balance) =>
             balance.symbol === "ETH"
               ? {
-                  ...balance,
-                  price: ethPrice,
-                  priceLoading: false,
-                  priceError: null,
-                }
+                ...balance,
+                price: ethPrice,
+                priceLoading: false,
+                priceError: null,
+              }
               : balance
           )
         )
@@ -97,10 +137,10 @@ export function useBalances() {
         prev.map((balance) =>
           balance.symbol === "ETH"
             ? {
-                ...balance,
-                priceLoading: false,
-                priceError: errorMessage,
-              }
+              ...balance,
+              priceLoading: false,
+              priceError: errorMessage,
+            }
             : balance
         )
       )
@@ -109,6 +149,11 @@ export function useBalances() {
   }, [])
 
   useEffect(() => {
+    // Fetch wallet balance if address is provided
+    if (walletAddress) {
+      fetchWalletEthBalance(walletAddress)
+    }
+
     // Fetch ETH price immediately
     fetchEthPrice()
     setLoading(false)
@@ -116,11 +161,14 @@ export function useBalances() {
     // Set up interval to fetch every minute (60000ms)
     const interval = setInterval(() => {
       fetchEthPrice()
+      if (walletAddress) {
+        fetchWalletEthBalance(walletAddress)
+      }
     }, 60000) // 60 seconds = 1 minute
 
     // Cleanup interval on unmount
     return () => clearInterval(interval)
-  }, [fetchEthPrice])
+  }, [fetchEthPrice, fetchWalletEthBalance, walletAddress])
 
   // Calculate total USD value
   const totalUsdValue = balances.reduce((total, balance) => {
@@ -138,4 +186,5 @@ export function useBalances() {
     refetch: fetchEthPrice,
   }
 }
+
 

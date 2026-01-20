@@ -65,3 +65,4 @@ export function WalletInfo({ walletName, walletAddress }: WalletInfoProps) {
   )
 }
 
+

@@ -14,8 +14,13 @@ interface BalanceContextType {
 
 const BalanceContext = createContext<BalanceContextType | undefined>(undefined)
 
-export function BalanceProvider({ children }: { children: ReactNode }) {
-  const balanceData = useBalances()
+interface BalanceProviderProps {
+  children: ReactNode
+  walletAddress?: string
+}
+
+export function BalanceProvider({ children, walletAddress }: BalanceProviderProps) {
+  const balanceData = useBalances(walletAddress)
 
   return (
     <BalanceContext.Provider value={balanceData}>
@@ -33,9 +38,10 @@ export function useBalanceContext() {
       totalUsdValue: 0,
       loading: true,
       lastUpdated: null,
-      refetch: async () => {},
+      refetch: async () => { },
     }
   }
   return context
 }
+
 

@@ -20,6 +20,23 @@ import {
   Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useWalletConnect } from "@/hooks/use-wallet-connect"
+
+// Wallet provider type definitions
+declare global {
+  interface Window {
+    ethereum?: {
+      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>
+      isMetaMask?: boolean
+      isTrust?: boolean
+      on?: (event: string, callback: (...args: unknown[]) => void) => void
+      removeListener?: (event: string, callback: (...args: unknown[]) => void) => void
+    }
+    coinbaseWalletProvider?: {
+      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>
+    }
+  }
+}
 
 interface WalletOption {
   id: string
@@ -217,8 +234,10 @@ interface WalletConnectModalProps {
 
 export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalProps) {
   const router = useRouter()
+  const { connectWallet, storeAndNavigate } = useWalletConnect()
   const [selectedChain, setSelectedChain] = useState<"All" | "Ethereum" | "Bitcoin" | "Stellar" | "Lightning">("All")
   const [connecting, setConnecting] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const chains = ["All", "Ethereum", "Bitcoin", "Stellar", "Lightning"] as const
 
@@ -229,27 +248,24 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
 
   const handleConnect = async (walletId: string) => {
     setConnecting(walletId)
-    
-    // Simulate connection delay
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    
-    // Here you would implement actual wallet connection logic
-    // For now, we'll simulate getting a wallet address
-    const wallet = walletOptions.find((w) => w.id === walletId)
-    if (wallet) {
-      // Generate a mock address (in real app, get from wallet)
-      const mockAddress = `0x${Math.random().toString(16).substr(2, 40)}`
-      
-      // Store wallet info and navigate to dashboard
-      localStorage.setItem("walletName", wallet.name)
-      localStorage.setItem("walletAddress", mockAddress)
-      
-      // Navigate to dashboard with wallet info
-      router.push(`/dashboard?wallet=${encodeURIComponent(wallet.name)}&address=${mockAddress}`)
+    setError(null)
+
+    try {
+      const wallet = walletOptions.find((w) => w.id === walletId)
+      if (!wallet) {
+        throw new Error("Wallet not found")
+      }
+
+      const { address, walletName } = await connectWallet({ id: walletId, name: wallet.name })
+      storeAndNavigate(address, walletName)
       onOpenChange(false)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to connect wallet"
+      setError(errorMessage)
+      console.error("Wallet connection error:", err)
+    } finally {
+      setConnecting(null)
     }
-    
-    setConnecting(null)
   }
 
   return (
@@ -284,6 +300,13 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
             ))}
           </div>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="px-6 py-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg mx-6 mb-3">
+            <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+          </div>
+        )}
 
         {/* Wallet List */}
         <div className="flex-1 overflow-y-auto px-6 pb-6">

@@ -10,9 +10,10 @@ import { BalanceProvider } from "@/contexts/balance-context"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
+  walletAddress?: string
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export function DashboardLayout({ children, walletAddress }: DashboardLayoutProps) {
   const handleDisconnect = () => {
     localStorage.removeItem("walletName")
     localStorage.removeItem("walletAddress")
@@ -20,7 +21,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <BalanceProvider>
+    <BalanceProvider walletAddress={walletAddress}>
       <div className="min-h-screen bg-background">
         {/* Header */}
         <motion.header
