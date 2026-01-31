@@ -32,7 +32,7 @@ function LiveRate() {
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
 
   useEffect(() => {
-    const fetchRate = async () => {
+    const fetchRate = () => {
       try {
         const baseRate = 1.0
         const marketVariance = (Math.random() - 0.5) * 0.002

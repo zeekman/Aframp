@@ -90,7 +90,7 @@ export function ReceiveModal({ open, onOpenChange }: ReceiveModalProps) {
           </div>
 
           <div className="text-xs text-muted-foreground text-center">
-            Make sure you're sending tokens on the correct network
+            Make sure you'#39;re sending tokens on the correct network
           </div>
         </div>
       </DialogContent>

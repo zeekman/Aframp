@@ -17,9 +17,9 @@ interface DashboardContentProps {
 
 export function DashboardContent({ walletName, walletAddress }: DashboardContentProps) {
   const [activeModal, setActiveModal] = useState<"swap" | "send" | "receive" | null>(null)
-  
+
   // Get all balances with prices from context
-  const { balances, totalUsdValue, loading, lastUpdated } = useBalanceContext()
+  const { balances, totalUsdValue, lastUpdated } = useBalanceContext()
 
   return (
     <div className="space-y-6">
@@ -42,7 +42,7 @@ export function DashboardContent({ walletName, walletAddress }: DashboardContent
           <BalanceCard key={balance.symbol} balance={balance} />
         ))}
       </div>
-      
+
       {/* Price Update Status */}
       {lastUpdated && (
         <div className="text-xs text-muted-foreground text-center">

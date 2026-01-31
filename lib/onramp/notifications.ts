@@ -1,5 +1,4 @@
 import { OnrampOrder } from "@/types/onramp"
-import { formatCurrency } from "./formatters"
 
 export interface NotificationData {
   orderId: string
@@ -15,14 +14,14 @@ export function sendEmailNotification(type: string, data: NotificationData): Pro
   // This would integrate with your email service (SendGrid, Resend, etc.)
   const { subject, message } = getDetailedNotificationMessage(type, data)
   
-  console.log(`Email notification: ${type}`)
-  console.log(`Subject: ${subject}`)
-  console.log(`Message: ${message}`)
+  console.warn(`Email notification: ${type}`)
+  console.warn(`Subject: ${subject}`)
+  console.warn(`Message: ${message}`)
   
   // Simulate API call to email service
   return new Promise((resolve) => {
     setTimeout(() => {
-      console.log(`✅ Email sent for ${type}`)
+      console.warn(`✅ Email sent for ${type}`)
       resolve()
     }, 1000)
   })
@@ -32,13 +31,13 @@ export function sendSMSNotification(type: string, data: NotificationData): Promi
   // This would integrate with Twilio or similar SMS service
   const { message } = getDetailedNotificationMessage(type, data)
   
-  console.log(`SMS notification: ${type}`)
-  console.log(`Message: ${message.substring(0, 160)}...`) // SMS character limit
+  console.warn(`SMS notification: ${type}`)
+  console.warn(`Message: ${message.substring(0, 160)}...`) // SMS character limit
   
   // Simulate API call to SMS service
   return new Promise((resolve) => {
     setTimeout(() => {
-      console.log(`✅ SMS sent for ${type}`)
+      console.warn(`✅ SMS sent for ${type}`)
       resolve()
     }, 1000)
   })

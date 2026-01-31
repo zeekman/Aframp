@@ -6,21 +6,21 @@ import { notifyOrderUpdate } from "./notifications"
  * This would be called by your backend services at each stage
  */
 export async function simulateOnrampFlow(order: OnrampOrder) {
-  console.log("🚀 Starting onramp flow simulation...")
+  console.warn("🚀 Starting onramp flow simulation...")
 
   // 1. Order created
-  console.log("📝 Order created")
+  console.warn("📝 Order created")
   await notifyOrderUpdate(order, "order_created")
   await delay(2000)
 
   // 2. Payment received
-  console.log("💳 Payment received")
+  console.warn("💳 Payment received")
   const updatedOrder = { ...order, status: "payment_received" as const }
   await notifyOrderUpdate(updatedOrder, "payment_received")
   await delay(3000)
 
   // 3. Transaction complete
-  console.log("✅ Transaction complete")
+  console.warn("✅ Transaction complete")
   const completedOrder = { 
     ...updatedOrder, 
     status: "completed" as const,
@@ -29,7 +29,7 @@ export async function simulateOnrampFlow(order: OnrampOrder) {
   }
   await notifyOrderUpdate(completedOrder, "transfer_complete")
 
-  console.log("🎉 Onramp flow completed successfully!")
+  console.warn("🎉 Onramp flow completed successfully!")
   return completedOrder
 }
 
@@ -51,7 +51,7 @@ export function logSuccessfulConversion(order: OnrampOrder) {
     referrer: typeof window !== "undefined" ? window.document.referrer : null
   }
 
-  console.log("📊 Analytics: Successful conversion logged", analyticsData)
+  console.warn("📊 Analytics: Successful conversion logged", analyticsData)
   
   // In production, this would send to your analytics service
   // Examples: Google Analytics, Mixpanel, Amplitude, etc.

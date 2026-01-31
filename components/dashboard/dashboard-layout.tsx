@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { Wallet, Home, LogOut } from "lucide-react"
+import { Home, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { EthPriceTicker } from "@/components/dashboard/eth-price-ticker"

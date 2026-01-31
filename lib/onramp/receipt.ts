@@ -1,5 +1,4 @@
 import { OnrampOrder } from "@/types/onramp"
-import { formatCurrency } from "./formatters"
 
 export function generateReceiptPDF(order: OnrampOrder): void {
   // Enhanced receipt data with all required fields
@@ -109,7 +108,7 @@ Thank you for using AFRAMP!
   URL.revokeObjectURL(url)
 
   // Log successful receipt generation for analytics
-  console.log("Receipt generated:", {
+  console.warn("Receipt generated:", {
     receiptNumber: receiptData.receiptNumber,
     orderId: order.id,
     timestamp: new Date().toISOString()

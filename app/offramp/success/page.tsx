@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useState, useRef } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Check, Download, Mail, Share2, ArrowRight, ExternalLink, History, LayoutDashboard, Star, Plus, Loader2 } from "lucide-react"
@@ -31,7 +31,7 @@ export default function OfframpSuccessPage() {
         email: "user@email.com"
     }
 
-    const handleDownloadPdf = async () => {
+    const handleDownloadPdf = () => {
         setIsGeneratingPdf(true)
         try {
             const success = generateReceiptPDF(
@@ -69,14 +69,14 @@ export default function OfframpSuccessPage() {
             } else {
                 toast.error("Failed to generate PDF")
             }
-        } catch (err) {
+        } catch (_err) {
             toast.error("An error occurred")
         } finally {
             setIsGeneratingPdf(false)
         }
     }
 
-    const handleEmailReceipt = async () => {
+    const handleEmailReceipt = () => {
         setIsSendingEmail(true)
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1500))
@@ -84,7 +84,7 @@ export default function OfframpSuccessPage() {
         toast.success(`Receipt emailed to ${transaction.email}`)
     }
 
-    const handleShare = async () => {
+    const handleShare = () => {
         if (navigator.share) {
             try {
                 await navigator.share({
@@ -92,8 +92,8 @@ export default function OfframpSuccessPage() {
                     text: `I just withdrew ${formatCurrency(transaction.amount, "NGN")} via Aframp!`,
                     url: window.location.href,
                 })
-            } catch (err) {
-                console.log("Share failed", err)
+            } catch (_err) {
+                console.warn("Share failed", err)
             }
         } else {
             toast.info("Sharing is not supported on this browser")
@@ -275,7 +275,7 @@ export default function OfframpSuccessPage() {
                         </div>
                     </div>
                     <p className="text-xs text-muted-foreground border-t border-primary/10 pt-4">
-                        If you don't see this, wait 24 hours or <Link href="/support" className="text-primary hover:underline font-medium">Contact Support</Link>
+                        If you don&#39;t see this, wait 24 hours or <Link href="/support" className="text-primary hover:underline font-medium">Contact Support</Link>
                     </p>
                 </motion.div>
 

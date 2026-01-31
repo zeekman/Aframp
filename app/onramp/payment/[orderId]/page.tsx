@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { PaymentStatusTracker, type PaymentStatus } from "@/components/onramp/payment-status-tracker"
 import { VirtualAccountDisplay } from "@/components/onramp/virtual-account-display"
 import { PaymentInstructions } from "@/components/onramp/payment-instructions"
@@ -13,7 +13,7 @@ import { CountdownTimer } from "@/components/onramp/countdown-timer"
 import { OrderSummary } from "@/components/onramp/order-summary"
 
 // Mock order data - In production, this would come from an API
-const mockOrder = {
+const _mockOrder = {
   id: "ONR-20260119-A1B2C3",
   status: "pending" as PaymentStatus,
   fiatAmount: "50,000.00",
@@ -43,7 +43,6 @@ export default function PaymentPage() {
   const router = useRouter()
   const orderId = params.orderId as string
 
-  const [order, setOrder] = useState(mockOrder)
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("pending")
   const [isPolling, setIsPolling] = useState(true)
 
@@ -57,12 +56,12 @@ export default function PaymentPage() {
       // In production, this would call an API to check payment status
       // For demo, we'll simulate a random status change after some time
       const elapsedTime = Date.now() - order.createdAt.getTime()
-      
+
       // Simulate payment detection after 15 seconds for demo purposes
       if (elapsedTime > 15000 && paymentStatus === "pending") {
         setPaymentStatus("detecting")
       }
-      
+
       // Simulate confirmation after 20 seconds
       if (elapsedTime > 20000 && paymentStatus === "detecting") {
         setPaymentStatus("confirmed")

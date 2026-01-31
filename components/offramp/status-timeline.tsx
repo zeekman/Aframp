@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { Check, Loader2, Clock, XCircle, ExternalLink, Copy, HelpCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react"
+import { _useState, _useEffect } from "react"
 
 export type StepStatus = "complete" | "in-progress" | "waiting" | "failed"
 

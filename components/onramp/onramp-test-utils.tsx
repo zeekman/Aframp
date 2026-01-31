@@ -37,7 +37,7 @@ export function OnrampTestUtils() {
     setIsLoading(true)
     try {
       generateReceiptPDF(sampleOrder)
-      console.log("✅ Receipt generated successfully")
+      console.warn("✅ Receipt generated successfully")
     } catch (error) {
       console.error("❌ Receipt generation failed:", error)
     } finally {
@@ -48,7 +48,7 @@ export function OnrampTestUtils() {
   const testNotifications = async () => {
     setIsLoading(true)
     try {
-      console.log("🔔 Testing notification system...")
+      console.warn("🔔 Testing notification system...")
       
       // Test all notification types
       await notifyOrderUpdate(sampleOrder, "order_created")
@@ -60,7 +60,7 @@ export function OnrampTestUtils() {
       await notifyOrderUpdate(sampleOrder, "transfer_complete")
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      console.log("✅ All notifications sent successfully")
+      console.warn("✅ All notifications sent successfully")
     } catch (error) {
       console.error("❌ Notification test failed:", error)
     } finally {
@@ -72,7 +72,7 @@ export function OnrampTestUtils() {
     setIsLoading(true)
     try {
       const analyticsData = logSuccessfulConversion(sampleOrder)
-      console.log("✅ Analytics logged:", analyticsData)
+      console.warn("✅ Analytics logged:", analyticsData)
     } catch (error) {
       console.error("❌ Analytics logging failed:", error)
     } finally {
@@ -83,7 +83,7 @@ export function OnrampTestUtils() {
   const createTestOrder = () => {
     // Store sample order in localStorage for testing
     localStorage.setItem(`onramp:order:${sampleOrder.id}`, JSON.stringify(sampleOrder))
-    console.log("✅ Test order created in localStorage")
+    console.warn("✅ Test order created in localStorage")
     
     // Navigate to success page
     window.location.href = `/onramp/success?order=${sampleOrder.id}`

@@ -90,7 +90,7 @@ export function Pricing() {
             Simple, transparent pricing
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Start free, upgrade when you're ready. No hidden fees, ever.
+            Start free, upgrade when you'#39;re ready. No hidden fees, ever.
           </p>
         </motion.div>
 

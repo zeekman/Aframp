@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
 import {
   Dialog,
   DialogContent,
@@ -11,7 +10,6 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { ArrowLeftRight, ArrowDown } from "lucide-react"
-import { cn } from "@/lib/utils"
 
 interface SwapModalProps {
   open: boolean

@@ -37,19 +37,19 @@ export function StepReview() {
 
     const handleConfirm = () => {
         // Proceed to next step (e.g. pending status page)
-        console.log("Order confirmed:", order.id)
+        console.warn("Order confirmed:", order.id)
         // router.push(`/offramp/status/${order.id}`)
         alert("Order Confirmed! Redirecting to status page...")
     }
 
     const handleEdit = () => {
         // Go back to previous step
-        console.log("Edit requested")
+        console.warn("Edit requested")
         router.back()
     }
 
     const handleRefresh = () => {
-        console.log("Refreshing rate...")
+        console.warn("Refreshing rate...")
         if (order) {
             setOrder({
                 ...order,
