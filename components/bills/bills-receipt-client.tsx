@@ -41,7 +41,45 @@ export function BillsReceiptClient({ transactionId }: BillsReceiptClientProps) {
     if (!transaction) return
     setBusy("pdf")
     try {
-      const ok = await generateReceiptPDF("receipt-card", `Aframp-Receipt-${transaction.reference}.pdf`)
+      const ok = generateReceiptPDF(
+        {
+          title: "Aframp Bills Receipt",
+          reference: transaction.reference,
+          subtitle: new Date(transaction.createdAt).toLocaleString(),
+          sections: [
+            {
+              title: "Transaction Details",
+              rows: [
+                ["Biller", transaction.biller],
+                ["Category", transaction.billerCategory],
+                ["Account", transaction.accountLabel],
+                ["Payment Method", transaction.paymentMethod],
+              ].map(([label, value]) => ({ label, value })),
+            },
+            {
+              title: "Amounts",
+              rows: [
+                ["Amount", formatCurrency(transaction.amount, transaction.currency as any)],
+                ["Fees", formatCurrency(transaction.fee, transaction.currency as any)],
+                [
+                  "Net Received",
+                  formatCurrency(transaction.amount - transaction.fee, transaction.currency as any),
+                ],
+              ].map(([label, value]) => ({ label, value })),
+            },
+            {
+              title: "Status",
+              rows: [
+                ["Status", statusLabel],
+                ["Reference", transaction.reference],
+              ].map(([label, value]) => ({ label, value })),
+            },
+          ],
+          totalLabel: "Total Paid",
+          totalValue: formatCurrency(transaction.amount, transaction.currency as any),
+        },
+        `Aframp-Receipt-${transaction.reference}.pdf`
+      )
       if (!ok) {
         toast.error("Unable to generate PDF receipt")
       } else {
