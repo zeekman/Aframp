@@ -5,6 +5,8 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowLeft, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { useWalletConnection } from '@/hooks/use-wallet-connection'
 // Note: Input component will be created separately
 import { CountrySelector } from './country-selector'
 import { CategoryGrid } from '@/components/bills/category-grid'
@@ -21,6 +23,8 @@ export function BillsPageClient() {
   const [selectedCountry, setSelectedCountry] = useState('NG')
   const { categories, transactions, recentBillers, scheduledPayments, loading } =
     useBillsData(selectedCountry)
+  const { address, connected } = useWalletConnection()
+  const headerAddress = address ? `${address.slice(0, 4)}...${address.slice(-4)}` : ''
 
   // Debounced search
   const [debouncedSearch, setDebouncedSearch] = useState(searchQuery)
@@ -54,6 +58,13 @@ export function BillsPageClient() {
             </div>
 
             <div className="flex items-center gap-3">
+              <ThemeToggle />
+              {connected && headerAddress ? (
+                <div className="flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-1 text-xs">
+                  <span className="h-2 w-2 rounded-full bg-success pulse-glow" />
+                  {headerAddress}
+                </div>
+              ) : null}
               <CountrySelector
                 selectedCountry={selectedCountry}
                 onCountryChange={setSelectedCountry}

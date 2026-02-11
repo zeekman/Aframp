@@ -11,7 +11,6 @@ import { ConnectButton } from '@/components/Wallet'
 const navItems = [
   { label: 'Features', href: '#features' },
   { label: 'How it Works', href: '#how-it-works' },
-  { label: 'Pricing', href: '#pricing' },
 ]
 
 export function Navbar() {
@@ -72,24 +71,14 @@ export function Navbar() {
           </Link>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="hidden md:flex items-center gap-2">
+        {/* Right side: Theme Toggle and Connect Button */}
+        <div className="flex items-center gap-3">
           <ThemeToggle />
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground hover:bg-muted"
-          >
-            Explore
-          </Button>
           <ConnectButton />
-        </div>
 
-        {/* Mobile Menu Button */}
-        <div className="flex md:hidden items-center gap-1">
-          <ThemeToggle />
+          {/* Mobile Menu Button - inside the right group */}
           <button
-            className="p-2 text-muted-foreground hover:text-foreground"
+            className="p-2 md:hidden text-muted-foreground hover:text-foreground"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
