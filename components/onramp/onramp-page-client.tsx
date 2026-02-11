@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useMemo, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { LogOut } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { ConnectButton } from '@/components/Wallet'
+import { useWallet } from '@/hooks/useWallet'
 import {
   Dialog,
   DialogContent,
@@ -19,17 +20,19 @@ import { useOnrampForm } from '@/hooks/use-onramp-form'
 import { useWalletConnection } from '@/hooks/use-wallet-connection'
 import { OnrampTestUtils } from '@/components/onramp/onramp-test-utils'
 import type { CryptoAsset, FiatCurrency } from '@/types/onramp'
-import { formatCurrency, truncateAddress } from '@/lib/onramp/formatters'
+import { formatCurrency } from '@/lib/onramp/formatters'
 import { isValidStellarAddress } from '@/lib/onramp/validation'
 import type { OnrampOrder } from '@/types/onramp'
+import { Button } from '@/components/ui/button' // Added missing import for Button
 
 const ORDER_KEY = 'onramp:latest-order'
 
 export function OnrampPageClient() {
   const router = useRouter()
+  const { isConnected: storeConnected, publicKey } = useWallet()
   const { address, addresses, connected, loading, updateAddress, disconnect } =
     useWalletConnection()
-  const walletConnected = Boolean(address) || connected
+  const walletConnected = Boolean(address) || connected || storeConnected || Boolean(publicKey)
   const [walletModalOpen, setWalletModalOpen] = useState(false)
   const [disconnectModalOpen, setDisconnectModalOpen] = useState(false)
   const [rateOverride, setRateOverride] = useState(0)
@@ -40,42 +43,48 @@ export function OnrampPageClient() {
     form.state.cryptoAsset
   )
 
-  // Use ref to track previous values and avoid setState in effect
-  const prevRateRef = useRef<number | undefined>(undefined)
-  const prevCurrencyRef = useRef<string | undefined>(undefined)
-  const prevAssetRef = useRef<string | undefined>(undefined)
-
+  // Sync rate override when rate changes - using useEffect with proper async pattern
   useEffect(() => {
-    if (data?.rate && data.rate !== prevRateRef.current) {
-      prevRateRef.current = data.rate
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setRateOverride(data.rate)
+    if (data?.rate) {
+      const timer = setTimeout(() => {
+        setRateOverride(data.rate)
+      }, 0)
+      return () => clearTimeout(timer)
     }
   }, [data?.rate])
 
+  // Reset rate override when currency or asset changes
   useEffect(() => {
-    const currencyKey = `${form.state.fiatCurrency}-${form.state.cryptoAsset}`
-    const prevKey = `${prevCurrencyRef.current}-${prevAssetRef.current}`
-
-    if (currencyKey !== prevKey) {
-      prevCurrencyRef.current = form.state.fiatCurrency
-      prevAssetRef.current = form.state.cryptoAsset
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    const timer = setTimeout(() => {
       setRateOverride(0)
-    }
+    }, 0)
+    return () => clearTimeout(timer)
   }, [form.state.fiatCurrency, form.state.cryptoAsset])
 
   useEffect(() => {
     router.prefetch('/onramp/payment')
   }, [router])
 
-  // Fix ESLint: Use setTimeout to avoid direct setState in effect
+  // Only show modal if definitely not connected after loading
   useEffect(() => {
     if (!loading && !walletConnected) {
-      const timer = setTimeout(() => setWalletModalOpen(true), 0)
+      const timer = setTimeout(() => {
+        // Double check after timeout to avoid flicker
+        if (!walletConnected) {
+          const timer2 = setTimeout(() => {
+            setWalletModalOpen(true)
+          }, 0)
+          return () => clearTimeout(timer2)
+        }
+      }, 500)
+      return () => clearTimeout(timer)
+    } else if (walletConnected && walletModalOpen) {
+      const timer = setTimeout(() => {
+        setWalletModalOpen(false)
+      }, 0)
       return () => clearTimeout(timer)
     }
-  }, [loading, walletConnected])
+  }, [loading, walletConnected, walletModalOpen])
 
   const handleCopy = async () => {
     try {
@@ -124,7 +133,6 @@ export function OnrampPageClient() {
     setDisconnectModalOpen(true)
   }
 
-  const headerAddress = useMemo(() => truncateAddress(address, 4), [address])
   const processingFeeLabel =
     form.state.paymentMethod === 'bank_transfer'
       ? 'FREE'
@@ -169,24 +177,8 @@ export function OnrampPageClient() {
           </nav>
 
           <div className="flex items-center gap-3">
-            {walletConnected ? (
-              <div
-                className="flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-1 text-xs text-foreground"
-                title={address}
-              >
-                <span className="h-2 w-2 rounded-full bg-success pulse-glow" />
-                {headerAddress}
-              </div>
-            ) : null}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDisconnect}
-              className="hidden md:inline-flex"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Disconnect
-            </Button>
+            <ThemeToggle />
+            <ConnectButton />
           </div>
         </div>
       </header>

@@ -2,11 +2,13 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Home, LogOut } from 'lucide-react'
+import { Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { EthPriceTicker } from '@/components/dashboard/eth-price-ticker'
 import { BalanceProvider } from '@/contexts/balance-context'
+
+import { ConnectButton } from '@/components/Wallet'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -14,12 +16,6 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, walletAddress }: DashboardLayoutProps) {
-  const handleDisconnect = () => {
-    localStorage.removeItem('walletName')
-    localStorage.removeItem('walletAddress')
-    window.location.href = '/'
-  }
-
   return (
     <BalanceProvider walletAddress={walletAddress}>
       <div className="min-h-screen bg-background">
@@ -41,16 +37,13 @@ export function DashboardLayout({ children, walletAddress }: DashboardLayoutProp
               <div className="flex items-center gap-3">
                 <EthPriceTicker />
                 <ThemeToggle />
+                <ConnectButton />
                 <Link href="/">
                   <Button variant="ghost" size="sm">
                     <Home className="w-4 h-4 mr-2" />
                     Home
                   </Button>
                 </Link>
-                <Button variant="outline" size="sm" onClick={handleDisconnect}>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Disconnect
-                </Button>
               </div>
             </div>
           </div>
