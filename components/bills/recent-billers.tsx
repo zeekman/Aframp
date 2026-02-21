@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -95,47 +96,46 @@ export function RecentBillers({ billers, searchQuery, loading }: RecentBillersPr
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
             whileHover={{ y: -2 }}
-            className="group cursor-pointer"
           >
-            <Card className="h-full border-border bg-card hover:border-primary/50 transition-all duration-300">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
-                    {biller.logo}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <h3 className="font-medium truncate group-hover:text-primary transition-colors">
-                        {biller.name}
-                      </h3>
-                      {biller.popular && (
-                        <Star className="h-4 w-4 text-yellow-500 fill-current flex-shrink-0" />
-                      )}
+            <Link href={`/bills/pay/${biller.id}`} className="group cursor-pointer">
+              <Card className="h-full border-border bg-card hover:border-primary/50 transition-all duration-300">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
+                      {biller.logo}
                     </div>
 
-                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                      {biller.description}
-                    </p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <h3 className="font-medium truncate group-hover:text-primary transition-colors">
+                          {biller.name}
+                        </h3>
+                        {biller.popular && (
+                          <Star className="h-4 w-4 text-yellow-500 fill-current flex-shrink-0" />
+                        )}
+                      </div>
 
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-xs capitalize">
-                        {biller.category.replace('-', ' ')}
-                      </Badge>
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                        {biller.description}
+                      </p>
 
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 px-3 text-xs group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                      >
-                        <Clock className="h-3 w-3 mr-1" />
-                        Pay Now
-                      </Button>
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs capitalize">
+                          {biller.category.replace('-', ' ')}
+                        </Badge>
+
+                        <div
+                          className="h-8 px-3 text-xs flex items-center gap-1 rounded-md transition-colors group-hover:bg-primary group-hover:text-primary-foreground text-muted-foreground"
+                        >
+                          <Clock className="h-3 w-3" />
+                          Pay Now
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           </motion.div>
         ))}
       </div>

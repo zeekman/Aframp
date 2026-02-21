@@ -162,6 +162,28 @@ const MOCK_BILLERS: Biller[] = [
     trending: true,
     description: 'Recharge your Ikeja Electric prepaid meter.',
   },
+  {
+    id: 'mtn-data',
+    name: 'MTN Data',
+    logo: '📶',
+    category: 'mobile',
+    minAmount: 100,
+    maxAmount: 20000,
+    popular: true,
+    trending: true,
+    description: 'Quickly buy MTN data plans for any number.',
+  },
+  {
+    id: 'safaricom-airtime',
+    name: 'Safaricom',
+    logo: '🇰🇪',
+    category: 'mobile',
+    minAmount: 10,
+    maxAmount: 10000,
+    popular: false,
+    trending: false,
+    description: 'Recharge Safaricom airtime instantly.',
+  },
 ]
 
 const MOCK_TRANSACTIONS: BillsTransaction[] = [
