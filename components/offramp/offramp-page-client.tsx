@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { ConnectButton } from '@/components/Wallet'
 import { OfframpCalculator } from '@/components/offramp/offramp-calculator'
-import { useWalletConnection } from '@/hooks/use-wallet-connection'
+import { useWallet } from '@/hooks/useWallet'
 import { useOfframpRate } from '@/hooks/use-offramp-rate'
 import { useOfframpForm } from '@/hooks/use-offramp-form'
 import { useOfframpBalances } from '@/hooks/use-offramp-balances'
@@ -27,6 +27,10 @@ const assetUsdRates: Record<string, number> = {
 export function OfframpPageClient() {
   const router = useRouter()
   const { address, loading } = useWalletConnection()
+  const { publicKey, isConnected, isConnecting, disconnect } = useWallet()
+  const address = publicKey || ''
+  const connected = isConnected
+  const loading = isConnecting
   const [lockExpiresAt, setLockExpiresAt] = useState<number | null>(null)
   const [rateOverride, setRateOverride] = useState(0)
 
@@ -57,6 +61,17 @@ export function OfframpPageClient() {
   useEffect(() => {
     router.prefetch('/offramp/bank-details')
   }, [router])
+
+  const [, setLockCountdownTick] = useState(0)
+
+  useEffect(() => {
+    if (!lockExpiresAt) return
+
+    const interval = setInterval(() => {
+      setLockCountdownTick((prev) => prev + 1)
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [lockExpiresAt])
 
   const lockCountdown = useMemo(() => {
     if (!lockExpiresAt) return null

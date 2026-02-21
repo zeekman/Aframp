@@ -5,7 +5,7 @@ import { ShieldCheck, Wallet, ChevronRight, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { BankAccount, signKycMessage } from '@/lib/offramp/bank-service'
 import { toast } from 'sonner'
-import { useWalletConnection } from '@/hooks/use-wallet-connection'
+import { useWallet } from '@/hooks/useWallet'
 
 interface KYCSignatureProps {
   account: BankAccount
@@ -16,17 +16,17 @@ interface KYCSignatureProps {
 
 export function KYCSignature({ account, amount, onSigned, onBack }: KYCSignatureProps) {
   const [isSigning, setIsSigning] = React.useState(false)
-  const { address, connected } = useWalletConnection()
+  const { publicKey, isConnected } = useWallet()
 
   const handleSign = async () => {
-    if (!connected || !address) {
-      toast.error('Please connect your wallet first')
-      return
-    }
-
     setIsSigning(true)
     try {
-      const signature = await signKycMessage(address, amount, account.accountNumber)
+      if (!isConnected || !publicKey) {
+        toast.error('Please connect your Stellar wallet first')
+        return
+      }
+
+      const signature = await signKycMessage(publicKey, amount, account.accountNumber)
       onSigned(signature)
       toast.success('Message signed successfully')
     } catch {
@@ -73,10 +73,10 @@ export function KYCSignature({ account, amount, onSigned, onBack }: KYCSignature
               Signing Wallet
             </p>
             <p className="text-sm font-mono truncate text-foreground">
-              {connected ? address : 'No wallet connected'}
+              {isConnected && publicKey ? publicKey : 'No wallet connected'}
             </p>
           </div>
-          {connected && (
+          {isConnected && publicKey && (
             <div className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
           )}
         </div>
@@ -86,7 +86,7 @@ export function KYCSignature({ account, amount, onSigned, onBack }: KYCSignature
         <Button
           className="w-full h-14 rounded-xl text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-[0.98] transition-all bg-primary text-primary-foreground group"
           onClick={handleSign}
-          disabled={isSigning || !connected}
+          disabled={isSigning || !isConnected}
         >
           {isSigning ? (
             <div className="flex items-center gap-2">

@@ -180,10 +180,28 @@ export async function signKycMessage(
   _amount: number,
   _accountNumber: string
 ): Promise<string> {
-  // Simulate wallet signature
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  const message = `I authorize AFRAMP to send ₦${_amount.toLocaleString()} to account ${_accountNumber}`
 
-  // In a real app, we would use window.ethereum.request({ method: 'personal_sign', params: [message, address] })
-  // For this demo, we'll return a mock signature
-  return `0x${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2)}`
+  // Prefer a real Stellar wallet signature when available (e.g. Freighter)
+  if (typeof window !== 'undefined') {
+    type FreighterApi = {
+      signMessage: (payload: { message: string; publicKey: string }) => Promise<string>
+    }
+    const freighterApi = (window as Window & { freighterApi?: FreighterApi }).freighterApi
+    if (freighterApi && typeof freighterApi.signMessage === 'function') {
+      try {
+        const signature = await freighterApi.signMessage({
+          message,
+          publicKey: _address,
+        })
+        if (signature) return signature
+      } catch (error) {
+        console.warn('Stellar wallet signing failed, falling back to mock signature', error)
+      }
+    }
+  }
+
+  // Fallback: simulate wallet signature so the flow still works in demos
+  await new Promise((resolve) => setTimeout(resolve, 1000))
+  return `stellar-mock-signature-${Math.random().toString(36).slice(2)}`
 }

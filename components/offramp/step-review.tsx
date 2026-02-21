@@ -8,9 +8,14 @@ import { SettlementAddress } from './settlement-address'
 import { ConfirmationChecklist } from './confirmation-checklist'
 import { MOCK_ORDER, OfframpOrder } from '@/lib/offramp/mock-api'
 import { useRouter } from 'next/navigation'
+import { useWallet } from '@/hooks/useWallet'
+import { buildOfframpPaymentXdr } from '@/lib/offramp/stellar-offramp'
+import { toast } from 'sonner'
 
 export function StepReview() {
   const router = useRouter()
+  const { publicKey, isConnected, network, signTransaction } = useWallet()
+
   // In a real app, we'd fetch the order ID from URL or context
   const [order, setOrder] = React.useState<OfframpOrder | null>(null)
 
@@ -22,6 +27,7 @@ export function StepReview() {
     memo: false,
   })
   const [isValid, setIsValid] = React.useState(false)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   React.useEffect(() => {
     // Simulate fetching order data
@@ -31,21 +37,53 @@ export function StepReview() {
   if (!order)
     return <div className="p-8 text-center text-muted-foreground">Loading order details...</div>
 
-  const handleConfirm = () => {
-    // Proceed to next step (e.g. pending status page)
-    console.warn('Order confirmed:', order.id)
-    // router.push(`/offramp/status/${order.id}`)
-    alert('Order Confirmed! Redirecting to status page...')
+  const handleConfirm = async () => {
+    if (!isValid) return
+
+    if (!isConnected || !publicKey) {
+      toast.error('Please connect your Stellar wallet before sending crypto.')
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const xdr = await buildOfframpPaymentXdr({
+        sourcePublicKey: publicKey,
+        destination: order.settlementAddress,
+        amount: order.sourceAmount,
+        assetCode: order.sourceAsset,
+        network: network,
+        memo: order.memo,
+      })
+
+      const result = await signTransaction(xdr)
+
+      if (!result || !result.signedTxXdr) {
+        toast.error(result?.error || 'Signing was cancelled or failed.')
+        return
+      }
+
+      // Persist for demo / status page
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(`offramp:signedTx:${order.id}`, result.signedTxXdr)
+      }
+
+      toast.success('Transaction signed. Redirecting to processing...')
+      router.push(`/offramp/processing/${encodeURIComponent(order.id)}`)
+    } catch (error) {
+      console.error('Failed to prepare or sign transaction', error)
+      toast.error('Failed to prepare transaction. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleEdit = () => {
     // Go back to previous step
-    console.warn('Edit requested')
     router.back()
   }
 
   const handleRefresh = () => {
-    console.warn('Refreshing rate...')
     if (order) {
       setOrder({
         ...order,
@@ -109,6 +147,7 @@ export function StepReview() {
               setIsValid={setIsValid}
               checkedItems={checkedItems}
               setCheckedItems={setCheckedItems}
+              isSubmitting={isSubmitting}
             />
           </div>
         </div>

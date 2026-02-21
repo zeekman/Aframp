@@ -55,24 +55,42 @@ async function fetchErc20Balance(
   contract: string,
   address: string,
   decimals: number
-) {
-  const data = `0x70a08231${address.replace('0x', '').padStart(64, '0')}`
-  const response = await fetch(rpcUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'eth_call',
-      params: [{ to: contract, data }, 'latest'],
-    }),
-  })
+): Promise<number> {
+  try {
+    const data = `0x70a08231${address.replace('0x', '').padStart(64, '0')}`
+    const response = await fetch(rpcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'eth_call',
+        params: [{ to: contract, data }, 'latest'],
+      }),
+    })
 
-  if (!response.ok) throw new Error('RPC request failed')
-  const payload = await response.json()
-  if (!payload.result) return 0
-  const raw = BigInt(payload.result)
-  return Number(raw) / 10 ** decimals
+    if (!response.ok) {
+      console.warn('Failed to fetch ERC20 balance', {
+        rpcUrl,
+        contract,
+        status: response.status,
+      })
+      return 0
+    }
+
+    const payload = await response.json()
+    if (!payload.result) return 0
+
+    const raw = BigInt(payload.result)
+    return Number(raw) / 10 ** decimals
+  } catch (error) {
+    console.warn('Error while fetching ERC20 balance', {
+      rpcUrl,
+      contract,
+      error,
+    })
+    return 0
+  }
 }
 
 async function fetchStellarBalances(address: string) {
@@ -167,7 +185,7 @@ export function useOfframpBalances(address?: string) {
           })
         }
       } catch (error) {
-        console.error('Failed to load offramp balances', error)
+        console.warn('Failed to load offramp balances', error)
       }
 
       if (!cancelled) {

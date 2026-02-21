@@ -24,6 +24,7 @@ interface ConfirmationChecklistProps {
       memo: boolean
     }>
   >
+  isSubmitting?: boolean
 }
 
 export function ConfirmationChecklist({
@@ -35,6 +36,7 @@ export function ConfirmationChecklist({
   setIsValid,
   checkedItems,
   setCheckedItems,
+  isSubmitting = false,
 }: ConfirmationChecklistProps) {
   const handleCheck = (key: keyof typeof checkedItems) => {
     const newChecked = { ...checkedItems, [key]: !checkedItems[key] }
@@ -122,7 +124,7 @@ export function ConfirmationChecklist({
         <Button
           className="w-full h-16 text-sm font-black uppercase tracking-[0.2em] shadow-2xl shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98] transition-all rounded-[1.5rem] bg-primary text-primary-foreground group"
           size="lg"
-          disabled={!isValid}
+          disabled={!isValid || isSubmitting}
           onClick={onConfirm}
         >
           Confirm & Send Crypto
